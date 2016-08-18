@@ -82,7 +82,7 @@ class LaravelLogViewer
     /**
      * @return array
      */
-    public static function all()
+    public static function all($root = false)
     {
         $log = array();
 
@@ -117,18 +117,17 @@ class LaravelLogViewer
                 foreach ($log_levels as $level_key => $level_value) {
                     if (strpos(strtolower($h[$i]), '.' . $level_value)) {
 
-                        preg_match('/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\].*?(\w+)\.' . $level_key . ': (.*?)( in .*?:[0-9]+)?$/', $h[$i], $current);
+                        preg_match('/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\].*?\.' . $level_key . ': (.*?)( in .*?:[0-9]+)?$/', $h[$i], $current);
 
-                        if (!isset($current[3])) continue;
-
+                        if (!isset($current[2])) continue;
+                        if($root || 'info' == self::$levels_classes[$level_value])
                         $log[] = array(
-                            'context' => $current[2],
                             'level' => $level_value,
                             'level_class' => self::$levels_classes[$level_value],
                             'level_img' => self::$levels_imgs[$level_value],
                             'date' => $current[1],
-                            'text' => $current[3],
-                            'in_file' => isset($current[4]) ? $current[4] : null,
+                            'text' => $current[2],
+                            'in_file' => isset($current[3]) ? $current[3] : null,
                             'stack' => preg_replace("/^\n*/", '', $log_data[$i])
                         );
                     }
