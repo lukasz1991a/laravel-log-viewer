@@ -38,9 +38,11 @@ class LogViewerController extends Controller
             return Redirect::to(Request::url());
         }
 
-        $root = $this->auth->user()->roles()->where('alias', 'allLogs')->count();
+        $root = $this->auth->user()
+            ->roles()
+            ->where('alias', 'allLogs')
+            ->count();
         $logs = LaravelLogViewer::all($root);
-
         return View::make('laravel-log-viewer::log', [
             'logs' => $logs,
             'files' => LaravelLogViewer::getFiles(true),
