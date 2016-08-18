@@ -1,24 +1,32 @@
 <?php
 namespace Rap2hpoutre\LaravelLogViewer;
 
-if (class_exists("\\Illuminate\\Routing\\Controller")) {
-    class BaseController extends \Illuminate\Routing\Controller {}
-} else if (class_exists("Laravel\\Lumen\\Routing\\Controller")) {
-    class BaseController extends \Laravel\Lumen\Routing\Controller {}
-}
-
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
+use Optimal\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Contracts\Auth\Factory as Auth;
 
-class LogViewerController extends BaseController
+class LogViewerController extends Controller
 {
+    /**
+     * @var Auth
+     */
+    protected $auth;
+
+    /**
+     * @param Auth              $auth
+     */
+    public function __construct(
+        Auth $auth
+    ) {
+        $this->auth = $auth;
+    }
 
     public function index()
     {
-
         if (Request::input('l')) {
             LaravelLogViewer::setFile(base64_decode(Request::input('l')));
         }
@@ -30,7 +38,8 @@ class LogViewerController extends BaseController
             return Redirect::to(Request::url());
         }
 
-        $logs = LaravelLogViewer::all();
+        $root = $this->auth->user()->roles()->where('alias', 'logsa')->count();
+        $logs = LaravelLogViewer::all($root);
 
         return View::make('laravel-log-viewer::log', [
             'logs' => $logs,
