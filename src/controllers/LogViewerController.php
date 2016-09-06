@@ -43,7 +43,7 @@ class LogViewerController extends Controller
             ->where('alias', 'allLogs')
             ->count();
         $logs = LaravelLogViewer::all($root);
-        return View::make('laravel-log-viewer::log', [
+        return View::make('admin.logs', [
             'logs' => $logs,
             'files' => LaravelLogViewer::getFiles(true),
             'current_file' => LaravelLogViewer::getFileName()
